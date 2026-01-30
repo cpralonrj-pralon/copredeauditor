@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { Lock, User, AlertCircle } from 'lucide-react';
+import { supabase } from '@/lib/supabase';
 
 export function Login() {
     const { signIn } = useAuth();
@@ -18,6 +19,20 @@ export function Login() {
         setLoading(true);
 
         try {
+            // DIAGNOSTICO: Verificar se o perfil existe
+            console.log("🔍 Verificando perfil para:", login);
+            const { data: profileData, error: profileError } = await supabase
+                .from('profiles')
+                .select('*')
+                .ilike('login', login) // Case insensitive check
+                .single();
+
+            if (profileData) {
+                console.log("✅ Perfil encontrado no banco:", profileData);
+            } else {
+                console.warn("⚠️ Perfil NÃO encontrado. O script SQL rodou?", profileError);
+            }
+
             const { error } = await signIn(login, password);
             if (error) {
                 console.error("❌ Detalhe do erro:", error);
