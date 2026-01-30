@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import type { Incident } from '@/types';
-import { Eye, CheckCircle2, XCircle, Search } from 'lucide-react';
+import { Eye, CheckCircle2, XCircle, Search, UserX } from 'lucide-react';
 import { cn, formatExcelDate } from '@/lib/utils';
 import { AuditModal } from './AuditModal';
 import { supabase } from '@/lib/supabase';
@@ -171,7 +171,10 @@ export function IncidentTable() {
                                                     )}
                                                     <span className="text-xs truncate max-w-[150px]">{incident.audit_motivo}</span>
                                                     {incident.audit_login_ofensor && (
-                                                        <span className="text-xs text-slate-400 ml-1" title="Login Ofensor">({incident.audit_login_ofensor})</span>
+                                                        <div className="flex items-center gap-1 px-1.5 py-0.5 bg-red-50 border border-red-100 rounded text-[10px] font-semibold text-red-700 ml-1" title={`Ofensor: ${incident.audit_login_ofensor}`}>
+                                                            <UserX size={10} />
+                                                            {incident.audit_login_ofensor}
+                                                        </div>
                                                     )}
                                                     {incident.audit_evidencia_url && (
                                                         <a
