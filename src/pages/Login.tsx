@@ -19,26 +19,13 @@ export function Login() {
         setLoading(true);
 
         try {
-            // DIAGNOSTICO: Verificar se o perfil existe
-            console.log("🔍 Verificando perfil para:", login);
-            const { data: profileData, error: profileError } = await supabase
-                .from('profiles')
-                .select('*')
-                .ilike('login', login) // Case insensitive check
-                .single();
-
-            if (profileData) {
-                console.log("✅ Perfil encontrado no banco:", profileData);
-            } else {
-                console.warn("⚠️ Perfil NÃO encontrado. O script SQL rodou?", profileError);
-            }
-
             const { error } = await signIn(login, password);
             if (error) {
-                console.error("❌ Detalhe do erro:", error);
-                // Check for "Email not confirmed"
+                console.error("❌ Erro no login:", error);
                 if (error.message?.includes("Email not confirmed")) {
                     setError('Email não confirmado. Verifique no Supabase.');
+                } else if (error.message.includes("Database error")) {
+                    setError('Erro interno do Banco de Dados (500). Verifique permissões.');
                 } else {
                     setError('Login ou senha inválidos.');
                 }
