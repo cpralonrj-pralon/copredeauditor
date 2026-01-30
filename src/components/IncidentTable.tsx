@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import type { Incident } from '@/types';
-import { Eye, CheckCircle2, XCircle, Search, UserX } from 'lucide-react';
+import { Eye, CheckCircle2, XCircle, Search, UserX, Repeat } from 'lucide-react';
 import { cn, formatExcelDate } from '@/lib/utils';
 import { AuditModal } from './AuditModal';
 import { supabase } from '@/lib/supabase';
@@ -11,6 +11,8 @@ export function IncidentTable() {
     const [selectedIncident, setSelectedIncident] = useState<Incident | null>(null);
     const [filter, setFilter] = useState('Todos'); // 'Todos', 'Pendente', 'Tratado'
     const [search, setSearch] = useState('');
+
+    const [recurrenceMap, setRecurrenceMap] = useState<Record<string, number>>({});
 
     const fetchIncidents = async () => {
         setLoading(true);
@@ -25,7 +27,24 @@ export function IncidentTable() {
         if (error) {
             console.error('Error fetching incidents:', error);
         } else {
-            setIncidents(data as unknown as Incident[]);
+            const loadedIncidents = data as unknown as Incident[];
+            setIncidents(loadedIncidents);
+
+            // Calculate recurrence (Client-side for now, based on loaded data + potentially more if needed)
+            // Ideally this should be a DB view, but for <1000 items client side is fine.
+            // We'll just count how many times each (login + anomes) appears in the fetched list.
+            // For a more robust solution, we'd need a separate query aggregating the whole DB.
+
+            // Let's do a separate aggregate query for the relevant months/logins if possible, 
+            // but for now, let's map what we have.
+            const counts: Record<string, number> = {};
+            loadedIncidents.forEach(inc => {
+                if (inc.audit_login_ofensor && inc.anomes) {
+                    const key = `${inc.audit_login_ofensor}-${inc.anomes}`;
+                    counts[key] = (counts[key] || 0) + 1;
+                }
+            });
+            setRecurrenceMap(counts);
         }
         setLoading(false);
     };
@@ -174,6 +193,12 @@ export function IncidentTable() {
                                                         <div className="flex items-center gap-1 px-1.5 py-0.5 bg-red-50 border border-red-100 rounded text-[10px] font-semibold text-red-700 ml-1" title={`Ofensor: ${incident.audit_login_ofensor}`}>
                                                             <UserX size={10} />
                                                             {incident.audit_login_ofensor}
+                                                            {(recurrenceMap[`${incident.audit_login_ofensor}-${incident.anomes}`] || 0) > 1 && (
+                                                                <span className="flex items-center gap-0.5 ml-1 px-1 py-0.5 bg-red-100 text-red-800 rounded text-[9px]" title="Reincidente no mês">
+                                                                    <Repeat size={8} />
+                                                                    {recurrenceMap[`${incident.audit_login_ofensor}-${incident.anomes}`]}x
+                                                                </span>
+                                                            )}
                                                         </div>
                                                     )}
                                                     {incident.audit_evidencia_url && (
