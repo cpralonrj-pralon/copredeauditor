@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { UserPlus, Copy, CheckCircle, AlertCircle, Info } from 'lucide-react';
 
 export function AdminUsers() {
