@@ -55,9 +55,9 @@ export function Login() {
                                 <input
                                     type="text"
                                     value={login}
-                                    onChange={(e) => setLogin(e.target.value.toUpperCase())}
-                                    className="w-full pl-10 pr-4 py-2.5 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-slate-800 font-medium uppercase placeholder:normal-case"
-                                    placeholder="Ex: N0057998"
+                                    onChange={(e) => setLogin(e.target.value)}
+                                    className="w-full pl-10 pr-4 py-2.5 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-slate-800 font-medium placeholder:font-normal"
+                                    placeholder="Ex: n0057998"
                                     required
                                 />
                             </div>
