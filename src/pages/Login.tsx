@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { Lock, User, AlertCircle } from 'lucide-react';
-import { supabase } from '@/lib/supabase';
+// import { supabase } from '@/lib/supabase'; // Removed unused import to fix build error
 
 export function Login() {
     const { signIn } = useAuth();
