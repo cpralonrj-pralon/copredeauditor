@@ -14,45 +14,32 @@ export function AdminUsers() {
         setMessage(null);
         setLoading(true);
 
-        const email = `${login.trim().toLowerCase()}@claro.com.br`;
-
         try {
-            // 1. Create User in Auth (This usually requires Service Role if done client-side without open signup)
-            // Ideally we should use a backend function, but for now we try public signup if enabled.
-            // OR we inform the user to use the SQL script if this fails.
+            // Get current session token
+            const { data: { session } } = await supabase.auth.getSession();
 
-            const { data, error: signUpError } = await supabase.auth.signUp({
-                email,
-                password,
-                options: {
-                    data: {
-                        login: login.trim().toUpperCase(),
-                    }
-                }
+            if (!session) {
+                throw new Error('Você precisa estar logado para criar usuários.');
+            }
+
+            // Call Edge Function to create user (no auto-login)
+            const { data, error } = await supabase.functions.invoke('create-user', {
+                body: {
+                    login: login.trim(),
+                    password,
+                    role,
+                },
             });
 
-            if (signUpError) throw signUpError;
+            if (error) throw error;
 
-            if (data.user) {
-                // 2. Create Profile
-                // Check if profile exists (managed by trigger? or manual?)
-                // If we didn't use a trigger, we insert here.
-                const { error: profileError } = await supabase
-                    .from('profiles')
-                    .insert([
-                        { id: data.user.id, login: login.trim().toUpperCase(), role }
-                    ]);
-
-                if (profileError) {
-                    console.error('Profile creation failed:', profileError);
-                    // If profile creation fails but user was created, it's a partial success/failure.
-                    // But if RLS allows insert, it should work.
-                }
-
-                setMessage({ type: 'success', text: `Usuário ${login} criado com sucesso!` });
-                setLogin('');
-                setPassword('');
+            if (!data.success) {
+                throw new Error(data.error || 'Erro ao criar usuário');
             }
+
+            setMessage({ type: 'success', text: data.message });
+            setLogin('');
+            setPassword('');
 
         } catch (err: any) {
             console.error(err);
