@@ -72,8 +72,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
         // Handle if user typed the full email or just the login
         let email = cleanLogin;
-        if (!email.toLowerCase().endsWith('@coprede.auditor')) {
-            email = `${cleanLogin}@coprede.auditor`;
+        if (!email.toLowerCase().endsWith('@claro.com.br')) {
+            email = `${cleanLogin}@claro.com.br`;
         }
 
         // Final normalization to lowercase
