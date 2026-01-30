@@ -8,13 +8,14 @@ interface AuditModalProps {
     incident: Incident;
     isOpen: boolean;
     onClose: () => void;
-    onSave: (id: string, data: { status: 'Tratado', corrigido: boolean, motivo: string, loginOfensor?: string, evidenciaUrl?: string | null }) => void;
+    onSave: (id: string, data: { status: 'Tratado', corrigido: boolean, motivo: string, loginOfensor?: string, feedbackEnviado?: boolean, evidenciaUrl?: string | null }) => void;
 }
 
 export function AuditModal({ incident, isOpen, onClose, onSave }: AuditModalProps) {
     const [corrigido, setCorrigido] = useState<boolean | null>(null);
     const [motivo, setMotivo] = useState('');
     const [loginOfensor, setLoginOfensor] = useState('');
+    const [feedbackEnviado, setFeedbackEnviado] = useState(false);
     const [evidenciaUrl, setEvidenciaUrl] = useState<string | null>(null);
     const [uploading, setUploading] = useState(false);
 
@@ -27,6 +28,7 @@ export function AuditModal({ incident, isOpen, onClose, onSave }: AuditModalProp
             corrigido,
             motivo,
             loginOfensor,
+            feedbackEnviado,
             evidenciaUrl
         });
         onClose();
@@ -131,6 +133,22 @@ export function AuditModal({ incident, isOpen, onClose, onSave }: AuditModalProp
                             />
                         </div>
 
+
+
+                        {loginOfensor && (
+                            <div className="flex items-center gap-3 py-3 px-3 bg-blue-50 border border-blue-100 rounded-lg">
+                                <label className="flex items-center gap-2 cursor-pointer w-full">
+                                    <input
+                                        type="checkbox"
+                                        checked={feedbackEnviado}
+                                        onChange={(e) => setFeedbackEnviado(e.target.checked)}
+                                        className="w-4 h-4 text-blue-600 rounded bg-white border-slate-300 focus:ring-blue-500"
+                                    />
+                                    <span className="text-sm font-medium text-slate-700">Feedback já enviado ao técnico?</span>
+                                </label>
+                            </div>
+                        )}
+
                         <div>
                             <label className="block text-sm font-medium text-slate-700 mb-2">Evidência (Opcional)</label>
                             <div className="flex items-center gap-3">
@@ -175,7 +193,7 @@ export function AuditModal({ incident, isOpen, onClose, onSave }: AuditModalProp
                         Salvar Tratamento
                     </button>
                 </div>
-            </div>
-        </div>
+            </div >
+        </div >
     );
 }

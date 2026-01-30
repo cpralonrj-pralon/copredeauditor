@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import type { Incident } from '@/types';
-import { Eye, CheckCircle2, XCircle, Search, UserX, Repeat } from 'lucide-react';
+import { Eye, CheckCircle2, XCircle, Search, UserX, Repeat, MessageSquare } from 'lucide-react';
 import { cn, formatExcelDate } from '@/lib/utils';
 import { AuditModal } from './AuditModal';
 import { supabase } from '@/lib/supabase';
@@ -53,7 +53,7 @@ export function IncidentTable() {
         fetchIncidents();
     }, []);
 
-    const handleAudit = async (id: string, data: { status: 'Tratado', corrigido: boolean, motivo: string, loginOfensor?: string, evidenciaUrl?: string | null }) => {
+    const handleAudit = async (id: string, data: { status: 'Tratado', corrigido: boolean, motivo: string, loginOfensor?: string, feedbackEnviado?: boolean, evidenciaUrl?: string | null }) => {
         // Optimistic update
         setIncidents(prev => prev.map(inc =>
             inc.id === id ? {
@@ -62,6 +62,7 @@ export function IncidentTable() {
                 audit_corrigido: data.corrigido,
                 audit_motivo: data.motivo,
                 audit_login_ofensor: data.loginOfensor,
+                audit_feedback_enviado: data.feedbackEnviado,
                 audit_evidencia_url: data.evidenciaUrl || undefined,
                 audit_updated_at: new Date().toISOString(),
                 audit_login: 'User'
@@ -75,6 +76,7 @@ export function IncidentTable() {
                 audit_corrigido: data.corrigido,
                 audit_motivo: data.motivo,
                 audit_login_ofensor: data.loginOfensor,
+                audit_feedback_enviado: data.feedbackEnviado,
                 audit_evidencia_url: data.evidenciaUrl,
                 audit_updated_at: new Date().toISOString(),
                 audit_login: 'Usuario Atual', // Replace with real auth user if available
@@ -197,6 +199,12 @@ export function IncidentTable() {
                                                                 <span className="flex items-center gap-0.5 ml-1 px-1 py-0.5 bg-red-100 text-red-800 rounded text-[9px]" title="Reincidente no mês">
                                                                     <Repeat size={8} />
                                                                     {recurrenceMap[`${incident.audit_login_ofensor}-${incident.anomes}`]}x
+                                                                </span>
+                                                            )}
+                                                            {incident.audit_feedback_enviado && (
+                                                                <span className="flex items-center gap-0.5 ml-1 px-1 py-0.5 bg-green-100 text-green-800 rounded text-[9px]" title="Feedback Enviado">
+                                                                    <MessageSquare size={8} />
+                                                                    Feedback
                                                                 </span>
                                                             )}
                                                         </div>

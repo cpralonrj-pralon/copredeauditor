@@ -44,5 +44,6 @@ export interface Incident {
     audit_evidencia_url?: string;
     audit_login_ofensor?: string;
     audit_updated_at?: string;
+    audit_feedback_enviado?: boolean;
     created_at?: string;
 }
