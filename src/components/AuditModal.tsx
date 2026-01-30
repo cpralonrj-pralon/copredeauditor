@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, Upload } from 'lucide-react';
+import { X, Upload, Mail } from 'lucide-react';
 import type { Incident } from '@/types';
 import { cn } from '@/lib/utils';
 import { supabase } from '@/lib/supabase';
@@ -20,6 +20,27 @@ export function AuditModal({ incident, isOpen, onClose, onSave }: AuditModalProp
     const [uploading, setUploading] = useState(false);
 
     if (!isOpen) return null;
+
+    const handleSendEmail = () => {
+        if (!loginOfensor) {
+            alert('Por favor, preencha o Login do Ofensor antes de enviar o e-mail.');
+            return;
+        }
+
+        const subject = encodeURIComponent(`Feedback de Auditoria - Incidente ${incident.id_mostra || incident.id}`);
+        const body = encodeURIComponent(
+            `Olá ${loginOfensor},\n\n` +
+            `Identificamos uma oportunidade de melhoria referente ao incidente abaixo:\n\n` +
+            `🔹 *Incidente:* ${incident.id_mostra || incident.id}\n` +
+            `🔹 *Indicador:* ${incident.indicador}\n` +
+            `🔹 *Sintoma:* ${incident.sintoma}\n\n` +
+            `📝 *Motivo/Orientação:* \n${motivo || 'Favor verificar o procedimento correto.'}\n\n` +
+            (evidenciaUrl ? `📷 *Evidência:* ${evidenciaUrl}\n\n` : '') +
+            `Atenciosamente,\nAuditoria de Qualidade`
+        );
+
+        window.open(`mailto:?subject=${subject}&body=${body}`, '_blank');
+    };
 
     const handleSave = () => {
         if (corrigido === null || !motivo) return;
@@ -183,17 +204,27 @@ export function AuditModal({ incident, isOpen, onClose, onSave }: AuditModalProp
                     </div>
                 </div>
 
-                <div className="p-4 bg-slate-50 border-t border-slate-100 flex justify-end gap-3">
-                    <button onClick={onClose} className="px-4 py-2 text-sm text-slate-600 hover:bg-slate-100 rounded-lg font-medium">Cancelar</button>
+                <div className="p-4 bg-slate-50 border-t border-slate-100 flex justify-between gap-3">
                     <button
-                        onClick={handleSave}
-                        disabled={corrigido === null || !motivo}
-                        className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed shadow-sm shadow-blue-900/10"
+                        onClick={handleSendEmail}
+                        className="px-4 py-2 text-sm text-slate-700 hover:bg-slate-200 rounded-lg font-medium flex items-center gap-2 border border-slate-300 bg-white"
+                        title="Abrir E-mail no Outlook"
                     >
-                        Salvar Tratamento
+                        <Mail size={16} />
+                        Enviar E-mail
                     </button>
-                </div>
+                    <div className="flex gap-3">
+                        <button onClick={onClose} className="px-4 py-2 text-sm text-slate-600 hover:bg-slate-100 rounded-lg font-medium">Cancelar</button>
+                        <button
+                            onClick={handleSave}
+                            disabled={corrigido === null || !motivo}
+                            className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed shadow-sm shadow-blue-900/10"
+                        >
+                            Salvar Tratamento
+                        </button>
+                    </div>
+                </div >
             </div >
-        </div >
+        </div>
     );
 }
