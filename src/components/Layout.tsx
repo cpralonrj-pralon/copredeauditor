@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link, Outlet, useLocation } from 'react-router-dom';
-import { LayoutDashboard, FileSpreadsheet, ListChecks, Menu, User } from 'lucide-react';
+import { LayoutDashboard, FileSpreadsheet, ListChecks, Menu, User, BarChart2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 export function Layout() {
@@ -10,6 +10,7 @@ export function Layout() {
     const navItems = [
         { href: '/', label: 'Dashboard', icon: LayoutDashboard },
         { href: '/audit', label: 'Auditoria', icon: ListChecks },
+        { href: '/reports', label: 'Relatórios', icon: BarChart2 },
         { href: '/import', label: 'Importar Dados', icon: FileSpreadsheet },
     ];
 
