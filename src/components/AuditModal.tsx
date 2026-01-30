@@ -3,6 +3,7 @@ import { X, Upload, Mail } from 'lucide-react';
 import type { Incident } from '@/types';
 import { cn } from '@/lib/utils';
 import { supabase } from '@/lib/supabase';
+import { collaborators } from '@/data/collaborators';
 
 interface AuditModalProps {
     incident: Incident;
@@ -27,9 +28,13 @@ export function AuditModal({ incident, isOpen, onClose, onSave }: AuditModalProp
             return;
         }
 
+        const collaborator = collaborators[loginOfensor.toUpperCase().trim()];
+        const emailTo = collaborator ? collaborator.email : '';
+        const greetingName = collaborator ? collaborator.name.split(' ')[0] : loginOfensor; // First name or Login
+
         const subject = encodeURIComponent(`Feedback de Auditoria - Incidente ${incident.id_mostra || incident.id}`);
         const body = encodeURIComponent(
-            `Olá ${loginOfensor},\n\n` +
+            `Olá ${greetingName},\n\n` +
             `Identificamos uma oportunidade de melhoria referente ao incidente abaixo:\n\n` +
             `🔹 *Incidente:* ${incident.id_mostra || incident.id}\n` +
             `🔹 *Indicador:* ${incident.indicador}\n` +
@@ -39,7 +44,7 @@ export function AuditModal({ incident, isOpen, onClose, onSave }: AuditModalProp
             `Atenciosamente,\nAuditoria de Qualidade`
         );
 
-        window.open(`mailto:?subject=${subject}&body=${body}`, '_blank');
+        window.open(`mailto:${emailTo}?subject=${subject}&body=${body}`, '_blank');
     };
 
     const handleSave = () => {
