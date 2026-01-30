@@ -21,15 +21,27 @@ export function AuditModal({ incident, isOpen, onClose, onSave }: AuditModalProp
 
     if (!isOpen) return null;
 
-    const handleSendEmail = () => {
+    const handleSendEmail = async () => {
         if (!loginOfensor) {
             alert('Por favor, preencha o Login do Ofensor antes de enviar o e-mail.');
             return;
         }
 
-        const collaborator = collaborators[loginOfensor.toUpperCase().trim()];
-        const emailTo = collaborator ? collaborator.email : '';
-        const greetingName = collaborator ? collaborator.name.split(' ')[0] : loginOfensor; // First name or Login
+        // Fetch technician data from database
+        const { data: technician, error } = await supabase
+            .from('technicians')
+            .select('name, email')
+            .eq('login', loginOfensor.toUpperCase().trim())
+            .single();
+
+        if (error || !technician) {
+            alert(`Técnico com login "${loginOfensor}" não encontrado no banco de dados. Verifique o login e tente novamente.`);
+            console.error('Error fetching technician:', error);
+            return;
+        }
+
+        const emailTo = technician.email;
+        const greetingName = technician.name.split(' ')[0]; // First name or Login
 
         const subject = encodeURIComponent(`Feedback de Auditoria - Incidente ${incident.id_mostra || incident.id}`);
         const body = encodeURIComponent(
