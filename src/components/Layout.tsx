@@ -1,10 +1,13 @@
 import { useState } from 'react';
-import { Link, Outlet, useLocation } from 'react-router-dom';
-import { LayoutDashboard, FileSpreadsheet, ListChecks, Menu, User, BarChart2 } from 'lucide-react';
+import { useNavigate, Link, Outlet, useLocation } from 'react-router-dom';
+import { LayoutDashboard, FileSpreadsheet, ListChecks, Menu, User, BarChart2, LogOut } from 'lucide-react';
+import { useAuth } from '@/contexts/AuthContext';
 import { cn } from '@/lib/utils';
 
 export function Layout() {
     const location = useLocation();
+    const { profile, signOut, isAdmin } = useAuth();
+    const navigate = useNavigate();
     const [isSidebarOpen, setIsSidebarOpen] = useState(true);
 
     const navItems = [
@@ -13,6 +16,15 @@ export function Layout() {
         { href: '/reports', label: 'Relatórios', icon: BarChart2 },
         { href: '/import', label: 'Importar Dados', icon: FileSpreadsheet },
     ];
+
+    if (isAdmin) {
+        navItems.push({ href: '/admin', label: 'Usuários', icon: User });
+    }
+
+    const handleSignOut = async () => {
+        await signOut();
+        navigate('/login');
+    };
 
     return (
         <div className="flex h-screen bg-slate-50 overflow-hidden">
@@ -57,17 +69,26 @@ export function Layout() {
                 </nav>
 
                 <div className="p-4 border-t border-slate-800">
-                    <div className="flex items-center">
+                    <div className="flex items-center mb-3">
                         <div className="w-8 h-8 rounded-full bg-slate-700 flex items-center justify-center text-slate-300">
                             <User size={16} />
                         </div>
                         {isSidebarOpen && (
-                            <div className="ml-3">
-                                <p className="text-sm font-medium">Usuário</p>
-                                <p className="text-xs text-slate-500">Admin</p>
+                            <div className="ml-3 overflow-hidden">
+                                <p className="text-sm font-medium truncate" title={profile?.login}>{profile?.login || 'Usuário'}</p>
+                                <p className="text-xs text-slate-500 capitalize">{profile?.role || 'Visitante'}</p>
                             </div>
                         )}
                     </div>
+                    {isSidebarOpen && (
+                        <button
+                            onClick={handleSignOut}
+                            className="w-full flex items-center justify-center gap-2 px-3 py-2 text-xs text-slate-400 hover:text-white hover:bg-slate-800 rounded-lg transition-colors"
+                        >
+                            <LogOut size={14} />
+                            Sair do Sistema
+                        </button>
+                    )}
                 </div>
             </aside>
 

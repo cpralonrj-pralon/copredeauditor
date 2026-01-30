@@ -5,15 +5,26 @@ import { Dashboard } from './pages/Dashboard';
 import { AuditList } from './pages/AuditList';
 import { Import } from './pages/Import';
 import { Reports } from './pages/Reports';
+import { AdminUsers } from './pages/AdminUsers';
+
+import { Login } from './pages/Login';
+import { ProtectedRoute } from './components/ProtectedRoute';
 
 function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<Layout />}>
+        <Route path="/login" element={<Login />} />
+
+        <Route path="/" element={
+          <ProtectedRoute>
+            <Layout />
+          </ProtectedRoute>
+        }>
           <Route index element={<Dashboard />} />
           <Route path="audit" element={<AuditList />} />
           <Route path="reports" element={<Reports />} />
+          <Route path="admin" element={<AdminUsers />} />
           <Route path="import" element={<Import />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Route>
