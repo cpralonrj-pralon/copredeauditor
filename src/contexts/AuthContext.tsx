@@ -66,10 +66,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     };
 
     const signIn = async (login: string, password: string) => {
-        const cleanLogin = login.trim().toUpperCase();
-        const email = cleanLogin.endsWith('@COPREDE.AUDITOR')
-            ? cleanLogin
-            : `${cleanLogin}@coprede.auditor`;
+        // Always normalize to lowercase for the email to ensure matching
+        // But keep the input flexible
+        const cleanLogin = login.trim();
+
+        // Handle if user typed the full email or just the login
+        let email = cleanLogin;
+        if (!email.toLowerCase().endsWith('@coprede.auditor')) {
+            email = `${cleanLogin}@coprede.auditor`;
+        }
+
+        // Final normalization to lowercase
+        email = email.toLowerCase();
+
+        console.log("🔐 Tentando login com:", email); // Debug for user
+
         const { error } = await supabase.auth.signInWithPassword({
             email,
             password,

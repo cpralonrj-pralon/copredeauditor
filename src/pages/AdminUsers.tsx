@@ -14,7 +14,7 @@ export function AdminUsers() {
         setMessage(null);
         setLoading(true);
 
-        const email = `${login.trim().toUpperCase()}@coprede.auditor`;
+        const email = `${login.trim().toLowerCase()}@coprede.auditor`;
 
         try {
             // 1. Create User in Auth (This usually requires Service Role if done client-side without open signup)
