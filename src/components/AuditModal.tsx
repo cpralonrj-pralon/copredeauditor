@@ -3,7 +3,6 @@ import { X, Upload, Mail } from 'lucide-react';
 import type { Incident } from '@/types';
 import { cn } from '@/lib/utils';
 import { supabase } from '@/lib/supabase';
-import { collaborators } from '@/data/collaborators';
 
 interface AuditModalProps {
     incident: Incident;
