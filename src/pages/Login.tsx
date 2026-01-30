@@ -20,7 +20,13 @@ export function Login() {
         try {
             const { error } = await signIn(login, password);
             if (error) {
-                setError('Login ou senha inválidos.');
+                console.error("❌ Detalhe do erro:", error);
+                // Check for "Email not confirmed"
+                if (error.message?.includes("Email not confirmed")) {
+                    setError('Email não confirmado. Verifique no Supabase.');
+                } else {
+                    setError('Login ou senha inválidos.');
+                }
             } else {
                 navigate('/');
             }
