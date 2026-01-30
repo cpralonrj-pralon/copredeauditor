@@ -12,11 +12,11 @@ interface AuditModalProps {
 }
 
 export function AuditModal({ incident, isOpen, onClose, onSave }: AuditModalProps) {
-    const [corrigido, setCorrigido] = useState<boolean | null>(null);
-    const [motivo, setMotivo] = useState('');
-    const [loginOfensor, setLoginOfensor] = useState('');
-    const [feedbackEnviado, setFeedbackEnviado] = useState(false);
-    const [evidenciaUrl, setEvidenciaUrl] = useState<string | null>(null);
+    const [corrigido, setCorrigido] = useState<boolean | null>(incident.audit_corrigido ?? null);
+    const [motivo, setMotivo] = useState(incident.audit_motivo || '');
+    const [loginOfensor, setLoginOfensor] = useState(incident.audit_login_ofensor || '');
+    const [feedbackEnviado, setFeedbackEnviado] = useState(incident.audit_feedback_enviado || false);
+    const [evidenciaUrl, setEvidenciaUrl] = useState<string | null>(incident.audit_evidencia_url || null);
     const [uploading, setUploading] = useState(false);
 
     if (!isOpen) return null;
