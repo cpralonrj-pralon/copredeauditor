@@ -153,7 +153,8 @@ export function AdminUsers() {
                 </p>
                 <p className="mt-1">
                     Para que o cadastro funcione, a opção "Enable Email Signup" deve estar ativada no Supabase.
-                    O usuário será criado com o e-mail <strong>LOGIN@coprede.auditor</strong>.
+                    <br />
+                    O sistema cuidará do resto. O usuário acessará apenas com o <strong>LOGIN</strong> e a senha definida.
                 </p>
             </div>
         </div>
