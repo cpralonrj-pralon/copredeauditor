@@ -18,7 +18,7 @@ export function Dashboard() {
             // In a real app we might use RPC calls or specific group_by queries
             const [totalReq, pendingReq, treatedReq, dataReq] = await Promise.all([
                 supabase.from('assertividade_incidentes').select('*', { count: 'exact', head: true }),
-                supabase.from('assertividade_incidentes').select('*', { count: 'exact', head: true }).eq('status_audit', 'Pendente'),
+                supabase.from('assertividade_incidentes').select('*', { count: 'exact', head: true }).eq('status_audit', 'Pendente').eq('indicador_status', 'NÃO ADERENTE'),
                 supabase.from('assertividade_incidentes').select('*', { count: 'exact', head: true }).eq('status_audit', 'Tratado'),
                 supabase.from('assertividade_incidentes').select('*').order('created_at', { ascending: false })
             ]);
