@@ -37,6 +37,30 @@ export function Import() {
         setUploadSuccess(null);
         try {
             const parsedData = await parseExcel(file);
+
+            // Check for status mismatches
+            const invalidStatuses: Record<string, number> = {};
+            let validCount = 0;
+
+            parsedData.forEach(item => {
+                const status = (item.indicador_status || '').trim().toUpperCase();
+                if (status === 'NÃO ADERENTE') {
+                    validCount++;
+                } else {
+                    invalidStatuses[status] = (invalidStatuses[status] || 0) + 1;
+                }
+            });
+
+            if (validCount === 0 && parsedData.length > 0) {
+                const foundStatuses = Object.keys(invalidStatuses).join(', ') || 'Vazio';
+                setError(`Atenção: Nenhum registro "NÃO ADERENTE" encontrado. O sistema só mostra incidentes com este status. Status encontrados: ${foundStatuses}`);
+            } else if (Object.keys(invalidStatuses).length > 0) {
+                const foundStatuses = Object.entries(invalidStatuses).map(([k, v]) => `${k || 'Vazio'} (${v})`).join(', ');
+                console.warn("Status diferentes de NÃO ADERENTE encontrados:", invalidStatuses);
+                // Only warn, don't block
+                setError(`Aviso: ${parsedData.length - validCount} registros têm status diferente de "NÃO ADERENTE" e não aparecerão na lista de auditoria. (Encontrados: ${foundStatuses})`);
+            }
+
             setData(parsedData);
             setSuccess(true);
         } catch (err) {
@@ -64,6 +88,11 @@ export function Import() {
             const uniqueData = Array.from(uniqueDataMap.values());
 
             console.log(`Original count: ${data.length}, Unique count: ${uniqueData.length}`);
+
+            if (uniqueData.length === 0) {
+                throw new Error("Nenhum registro válido encontrado para importação. Verifique se a coluna 'ID_MOSTRA' existe e está preenchida em seu arquivo Excel.");
+            }
+
             if (data.length !== uniqueData.length) {
                 console.warn(`Removed ${data.length - uniqueData.length} duplicate records based on id_mostra.`);
             }

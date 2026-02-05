@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import type { Incident } from '@/types';
 import { Eye, CheckCircle2, XCircle, Search, UserX, Repeat, MessageSquare } from 'lucide-react';
 import { cn, formatExcelDate } from '@/lib/utils';
@@ -10,7 +10,13 @@ export function IncidentTable() {
     const [loading, setLoading] = useState(true);
     const [selectedIncident, setSelectedIncident] = useState<Incident | null>(null);
     const [filter, setFilter] = useState('Todos'); // 'Todos', 'Pendente', 'Tratado'
+    const [monthFilter, setMonthFilter] = useState('Todos');
     const [search, setSearch] = useState('');
+
+    const availableMonths = useMemo(() => {
+        const months = new Set(incidents.map(i => i.anomes).filter(Boolean));
+        return Array.from(months).sort().reverse();
+    }, [incidents]);
 
     const [recurrenceMap, setRecurrenceMap] = useState<Record<string, number>>({});
 
@@ -92,10 +98,11 @@ export function IncidentTable() {
 
     const filteredIncidents = incidents.filter(inc => {
         const matchesFilter = filter === 'Todos' || (inc.status_audit || 'Pendente') === filter;
+        const matchesMonth = monthFilter === 'Todos' || inc.anomes === monthFilter;
         const matchesSearch = !search ||
             inc.id_mostra?.toLowerCase().includes(search.toLowerCase()) ||
             inc.indicador?.toLowerCase().includes(search.toLowerCase());
-        return matchesFilter && matchesSearch;
+        return matchesFilter && matchesMonth && matchesSearch;
     });
 
     return (
@@ -115,11 +122,23 @@ export function IncidentTable() {
                         />
                     </div>
                     <select
+                        aria-label="Filtrar por mês"
+                        value={monthFilter}
+                        onChange={e => setMonthFilter(e.target.value)}
+                        className="px-3 py-2 border border-slate-200 rounded-lg text-sm bg-white text-slate-600 focus:outline-none focus:border-blue-500"
+                    >
+                        <option value="Todos">Todos os Meses</option>
+                        {availableMonths.map(month => (
+                            <option key={month} value={month}>{month}</option>
+                        ))}
+                    </select>
+                    <select
+                        aria-label="Filtrar por status"
                         value={filter}
                         onChange={e => setFilter(e.target.value)}
                         className="px-3 py-2 border border-slate-200 rounded-lg text-sm bg-white text-slate-600 focus:outline-none focus:border-blue-500"
                     >
-                        <option value="Todos">Todos</option>
+                        <option value="Todos">Todos os Status</option>
                         <option value="Pendente">Pendentes</option>
                         <option value="Tratado">Tratados</option>
                     </select>

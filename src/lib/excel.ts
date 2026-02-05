@@ -7,10 +7,15 @@ export const parseExcel = (file: File): Promise<Incident[]> => {
         reader.onload = (e) => {
             try {
                 const data = e.target?.result;
-                const workbook = XLSX.read(data, { type: 'binary' });
+                // Read without cellDates to avoid JS Date timezone pollution
+                const workbook = XLSX.read(data, { type: 'binary', cellNF: true });
                 const sheetName = workbook.SheetNames[0];
                 const sheet = workbook.Sheets[sheetName];
-                const jsonData = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+                const jsonData = XLSX.utils.sheet_to_json(sheet, {
+                    header: 1,
+                    raw: false,
+                    dateNF: 'dd/mm/yyyy hh:mm'
+                });
 
                 // Assume first row is header
                 const headers = (jsonData[0] as string[]).map(h => h.trim().toUpperCase());
