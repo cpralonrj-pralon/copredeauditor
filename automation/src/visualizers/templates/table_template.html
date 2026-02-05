@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ title }}</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: {
+                    {
+                    style.font_family
+                }
+            }
+
+            ;
+
+            font-size: {
+                    {
+                    style.font_size
+                }
+            }
+
+            ;
+            background: #f5f5f5;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 100%;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: {
+                    {
+                    style.header_bg
+                }
+            }
+
+            ;
+
+            color: {
+                    {
+                    style.header_color
+                }
+            }
+
+            ;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 24px;
+            font-weight: 600;
+        }
+
+        .header .timestamp {
+            margin-top: 8px;
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .table-wrapper {
+            overflow-x: auto;
+            padding: 20px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+        }
+
+        thead {
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        thead th {
+            background: {
+                    {
+                    style.header_bg
+                }
+            }
+
+            ;
+
+            color: {
+                    {
+                    style.header_color
+                }
+            }
+
+            ;
+            padding: 12px 16px;
+            text-align: left;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 12px;
+            letter-spacing: 0.5px;
+
+            border-bottom: 2px solid {
+                    {
+                    style.border_color
+                }
+            }
+
+            ;
+        }
+
+        tbody tr {
+            transition: background-color 0.2s ease;
+        }
+
+        tbody tr:nth-child(even) {
+            background: {
+                    {
+                    style.row_even_bg
+                }
+            }
+
+            ;
+        }
+
+        tbody tr:nth-child(odd) {
+            background: {
+                    {
+                    style.row_odd_bg
+                }
+            }
+
+            ;
+        }
+
+        tbody tr:hover {
+            background: #f0f7ff;
+        }
+
+        tbody td {
+            padding: 12px 16px;
+
+            border-bottom: 1px solid {
+                    {
+                    style.border_color
+                }
+            }
+
+            ;
+            vertical-align: top;
+        }
+
+        /* Status badges */
+        .status-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+            text-align: center;
+            white-space: nowrap;
+        }
+
+            {
+            % for status,
+            color in conditional_colors.items() %
+        }
+
+        .status- {
+                {
+                status|replace(' ', '-')|lower
+            }
+        }
+
+            {
+            background-color: {
+                    {
+                    color
+                }
+            }
+
+            ;
+
+            color: {
+                % if color in ['#FFC107',
+                '#FF9800'] %
+            }
+
+            #000 {
+                % else %
+            }
+
+            #fff {
+                % endif %
+            }
+
+            ;
+        }
+
+            {
+            % endfor %
+        }
+
+        /* Responsividade */
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+
+            .header h1 {
+                font-size: 20px;
+            }
+
+            .table-wrapper {
+                padding: 10px;
+            }
+
+            thead th,
+            tbody td {
+                padding: 8px;
+                font-size: 12px;
+            }
+        }
+
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+            }
+
+            .container {
+                box-shadow: none;
+            }
+
+            tbody tr:hover {
+                background: inherit !important;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>{{ title }}</h1>
+            <div class="timestamp">Gerado em: {{ timestamp }}</div>
+        </div>
+
+        <div class="table-wrapper">
+            <table id="data-table">
+                <thead>
+                    <tr>
+                        {% for column in columns %}
+                        <th>{{ column|title }}</th>
+                        {% endfor %}
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in data %}
+                    <tr>
+                        {% for column in columns %}
+                        <td>
+                            {% if column == 'status' %}
+                            <span class="status-badge status-{{ row[column]|replace(' ', '-')|lower }}">
+                                {{ row[column] }}
+                            </span>
+                            {% else %}
+                            {{ row[column] }}
+                            {% endif %}
+                        </td>
+                        {% endfor %}
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</body>
+
+</html>

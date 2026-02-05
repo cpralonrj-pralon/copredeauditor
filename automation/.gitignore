@@ -1,0 +1,46 @@
+# Environment Variables
+.env
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+env/
+ENV/
+.venv
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Temporary Files
+temp/
+downloads/
+*.tmp
+*.log
+
+# Output Files
+output/
+screenshots/
+*.png
+*.jpg
+*.jpeg
+
+# Selenium
+chromedriver
+geckodriver
+*.exe
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+logs/
+*.log

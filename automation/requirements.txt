@@ -1,0 +1,38 @@
+# Core Dependencies
+requests==2.31.0
+pandas==2.2.0
+numpy==1.26.3
+
+# Web Scraping & Automation
+selenium==4.17.2
+webdriver-manager==4.0.1
+beautifulsoup4==4.12.3
+lxml==5.1.0
+
+# Excel/Data Processing
+openpyxl==3.1.2
+xlrd==2.0.1
+
+# Configuration & Templates
+pyyaml==6.0.1
+jinja2==3.1.3
+python-dotenv==1.0.1
+
+# Scheduling
+schedule==1.2.1
+
+# Image Processing
+Pillow==10.2.0
+
+# Date/Time Handling
+pytz==2024.1
+python-dateutil==2.8.2
+
+# Logging
+colorlog==6.8.2
+
+# Retry Logic
+tenacity==8.2.3
+
+# HTTP Client Enhancements
+urllib3==2.1.0

@@ -51,27 +51,44 @@ export function Import() {
         if (data.length === 0) return;
         setUploading(true);
         setError(null);
+        setUploadSuccess(null);
 
         try {
+            // Deduplicate data based on id_mostra (keep the last one found)
+            const uniqueDataMap = new Map();
+            data.forEach(item => {
+                if (item.id_mostra) {
+                    uniqueDataMap.set(item.id_mostra, item);
+                }
+            });
+            const uniqueData = Array.from(uniqueDataMap.values());
+
+            console.log(`Original count: ${data.length}, Unique count: ${uniqueData.length}`);
+            if (data.length !== uniqueData.length) {
+                console.warn(`Removed ${data.length - uniqueData.length} duplicate records based on id_mostra.`);
+            }
+
             // Map Incident type to Database Insert type
             // We process in chunks to avoid payload limits
             const chunkSize = 100;
             let insertedCount = 0;
 
-            for (let i = 0; i < data.length; i += chunkSize) {
-                const chunk = data.slice(i, i + chunkSize).map(item => {
+            for (let i = 0; i < uniqueData.length; i += chunkSize) {
+                const chunk = uniqueData.slice(i, i + chunkSize).map(item => {
                     // eslint-disable-next-line @typescript-eslint/no-unused-vars
                     const { id, created_at, ...rest } = item; // Remove local ID if present
 
                     // Ensure all fields map correctly
                     return {
                         ...rest,
-                        tma: String(rest.tma), // Ensure string if needed or let implicit conversion handle if schema is numeric
+                        tma: String(rest.tma),
                         tmr: String(rest.tmr),
                         volume: Number(rest.volume),
                         anomes: String(rest.anomes)
                     };
                 });
+
+                console.log(`Uploading chunk ${i / chunkSize + 1}... (${chunk.length} items)`);
 
                 // Upsert: based on id_mostra (unique constraint must exist)
                 const { error: upsertError } = await supabase
@@ -81,15 +98,24 @@ export function Import() {
                         ignoreDuplicates: false // Update if exists
                     });
 
-                if (upsertError) throw upsertError;
+                if (upsertError) {
+                    console.error("Supabase Upsert Error:", upsertError);
+                    throw upsertError;
+                }
                 insertedCount += chunk.length;
             }
 
             setUploadSuccess(insertedCount);
-            setData([]); // Clear preview after success
+            console.log("Upload completed successfully:", insertedCount);
+
+            // Delay clearing data slightly so user sees the success state transition
+            setTimeout(() => {
+                setData([]);
+            }, 500);
+
         } catch (err) {
-            console.error(err);
-            const errorMessage = err instanceof Error ? err.message : 'Erro desconhecido';
+            console.error("Full error object:", err);
+            const errorMessage = err instanceof Error ? err.message : JSON.stringify(err);
             setError(`Erro ao salvar no banco: ${errorMessage}`);
         } finally {
             setUploading(false);

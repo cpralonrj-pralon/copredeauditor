@@ -1,0 +1,150 @@
+# Configuração da Automação de Coleta e Visualização de Dados
+
+# FONTE 1 - Web Scraper (Planilha)
+fonte1:
+  enabled: true
+  url: "https://exemplo.com/painel"  # Substituir pela URL real
+  download_wait_seconds: 10
+  login_required: false
+  # Se login for necessário:
+  # username: "usuario"
+  # password: "senha"
+  
+# FONTE 2 - API REST
+fonte2:
+  enabled: true
+  base_url: "https://api.exemplo.com/v1"  # Substituir pela URL real da API
+  auth_type: "bearer"  # Opções: bearer, api_key, basic, custom
+  token: ""  # Substituir pelo token real
+  # Para api_key:
+  # api_key_header: "X-API-Key"
+  # api_key_value: "sua-chave"
+  endpoints:
+    data: "/dados"  # Endpoint para buscar dados
+  pagination:
+    enabled: true
+    page_param: "page"
+    per_page_param: "per_page"
+    per_page: 100
+    max_pages: 10
+  timeout: 30
+  retry_attempts: 3
+  retry_delay: 5
+
+# PROCESSAMENTO DE DADOS
+processing:
+  # Mapeamento de colunas (ajustar conforme necessário)
+  column_mapping:
+    fonte1:
+      "Data": "data"
+      "Status": "status"
+      "Descrição": "descricao"
+      "Área": "area"
+      "Responsável": "responsavel"
+    fonte2:
+      "timestamp": "data"
+      "state": "status"
+      "description": "descricao"
+      "department": "area"
+      "assignee": "responsavel"
+  
+  # Tradução de códigos técnicos
+  status_translation:
+    "NEW": "Novo"
+    "PENDING": "Pendente"
+    "IN_QUEUE": "Em Fila"
+    "IN_PROGRESS": "Em Andamento"
+    "COMPLETED": "Concluído"
+    "CRITICAL": "Crítico"
+  
+  # Timezone
+  timezone: "America/Sao_Paulo"
+  date_format: "%d/%m/%Y %H:%M"
+
+# VISUALIZAÇÃO HTML/CSS
+visualization:
+  title: "Relatório de Dados Consolidados"
+  
+  # Cores condicionais (status -> cor)
+  conditional_colors:
+    "Pendente": "#FFC107"      # Amarelo
+    "Em Fila": "#2196F3"       # Azul
+    "Crítico": "#F44336"       # Vermelho
+    "Concluído": "#4CAF50"     # Verde
+    "Novo": "#FF9800"          # Laranja
+  
+  # Estilo corporativo
+  style:
+    font_family: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif"
+    header_bg: "#1e3a8a"       # Azul escuro
+    header_color: "#ffffff"
+    row_even_bg: "#f8f9fa"
+    row_odd_bg: "#ffffff"
+    border_color: "#dee2e6"
+    font_size: "14px"
+  
+  # Colunas a exibir (ordem importa)
+  columns:
+    - "data"
+    - "status"
+    - "area"
+    - "descricao"
+    - "responsavel"
+
+# SCREENSHOT
+screenshot:
+  output_path: "output/screenshot.png"
+  width: 1920
+  height: 1080
+  scale: 2  # Para alta resolução (retina)
+  wait_seconds: 2  # Aguardar renderização completa
+  
+# WHATSAPP
+whatsapp:
+  method: "n8n_webhook"  # Opções: n8n_webhook, evolution_api, official_api
+  
+  # n8n Webhook
+  n8n:
+    webhook_url: ""  # Substituir pela URL do webhook n8n
+  
+  # Evolution API
+  evolution:
+    base_url: "https://evolution-api.exemplo.com"
+    instance: "minha-instancia"
+    api_key: ""
+  
+  # WhatsApp Official API
+  official:
+    phone_number_id: ""
+    access_token: ""
+  
+  # Configurações gerais
+  recipient: "5521999999999"  # Número destino (com código do país)
+  caption: "📊 Relatório Atualizado - {timestamp}"
+  
+# PATHS E DIRETÓRIOS
+paths:
+  temp_dir: "temp"
+  output_dir: "output"
+  downloads_dir: "downloads"
+  logs_dir: "logs"
+
+# LOGGING
+logging:
+  level: "INFO"  # DEBUG, INFO, WARNING, ERROR, CRITICAL
+  format: "[%(asctime)s] %(levelname)s - %(message)s"
+  file: "logs/automation.log"
+  console: true
+  max_bytes: 10485760  # 10MB
+  backup_count: 5
+
+# AGENDAMENTO
+scheduler:
+  enabled: false
+  # Executar a cada X minutos
+  interval_minutes: 60
+  # Ou agendar em horários específicos
+  # schedule_times:
+  #   - "08:00"
+  #   - "12:00"
+  #   - "18:00"
